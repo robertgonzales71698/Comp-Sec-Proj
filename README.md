@@ -1,1 +1,2 @@
-# Comp-Sec-Proj
+# Computer Security Project
+## Gabriela Fisher - Isaigh Pugh - Robert Gonzales
