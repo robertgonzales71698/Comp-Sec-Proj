@@ -13,6 +13,9 @@ import java.lang.StringBuilder;
 public class PhishingDetector
 {
 
+	/*
+	* Parse Address function takes the email address and splits it up into parts to be analyzied
+	*/
 	public static String[] parseAddress(String emailAddress){
 		int atIndex =  emailAddress.indexOf("@");
 		int dotIndex = emailAddress.indexOf(".");
@@ -26,6 +29,10 @@ public class PhishingDetector
 		return parsedEmailAddress;
 	}
 
+	/*
+	* Check Address Name function checks the email address name to see if:
+	* 1 - Language matches user's language
+	*/
 	public static Boolean checkAddressName(String[] parsedAddress){
 		if (parsedAddress[0].equals("example")){
 			return true;
@@ -35,6 +42,10 @@ public class PhishingDetector
 		}
 	}
 
+	/*
+	* Check Domain function checks the domain of the email addressto see if:
+	* 1 - The domain matches any of the verified domains in the verified list
+	*/
 	public static Boolean checkDomain(String[] parsedAddress){
 		if (parsedAddress[0].equals("com") || parsedAddress[1].equals("org") || parsedAddress[1].equals("edu") || parsedAddress[1].equals("gov")){
 			return true;
@@ -44,16 +55,22 @@ public class PhishingDetector
 		}
 	}
 
+	/*
+	* Check Domain function checks the domain of the email addressto see if:
+	* 1 - The domain matches any of the verified domains in the verified list
+	*/
 	public static Boolean checkWebName(String[] parsedAddress){
-		if (parsedAddress[1].equals("gmail") || parsedAddress[1].equals("ymail")){
+		if (parsedAddress[1].equals("gmail") || parsedAddress[1].equals("ymail") || parsedAddress[1].equals("yahoo") || parsedAddress[1].equals("hotmail")){
 			return true;
 		}
+
 		/*
 		* Checks to see if .edu account, meaning more possible web names
 		*/
 		else if (checkDomain(parsedAddress) == true){
 			return true;
 		}
+
 		else {
 			return false;
 		}
@@ -64,6 +81,24 @@ public class PhishingDetector
 			return true;
 		}
 		else {
+			return false;
+		}
+	}
+
+	public static Boolean emailVerifier(Boolean addressVerifier, Boolean subjectVerifier, Boolean contentsVerifier){
+		if ((addressVerifier == true) && (subjectVerifier == true) && (contentsVerifier == true)){
+			return true;
+		}
+		else if ((addressVerifier == false) && (subjectVerifier == true) && (contentsVerifier == true)){
+			return true;
+		}
+		else if ((addressVerifier == true) && (subjectVerifier == false) && (contentsVerifier == true)){
+			return true;
+		}
+		else if ((addressVerifier == true) && (subjectVerifier == true) && (contentsVerifier == false)){
+			return true;
+		}
+		else{
 			return false;
 		}
 	}
@@ -83,5 +118,11 @@ public class PhishingDetector
 		  //TODO Run contents through grammer checker
 
 		  //TODO Print results
+			if (emailVerifier(emailAddressVerifier(parsedEmailAddress), true, true) == true){
+				System.out.println("All tests have passed: Email is verified");
+			}
+			else {
+				System.out.println("Not all tests have passed: Email is unverified");
+			}
      }
 }
