@@ -19,8 +19,8 @@ import java.util.Scanner;
 
 public class PhishingDetector
 {
-	public static double subjectPercentage;
-	public static double contentsPercentage;
+	public static double subjectPercentageMisspelled;
+	public static double contentsPercentageMisspelled;
 	public static boolean addressResult;
 	public static boolean subjectResult;
 	public static boolean contentsResult;
@@ -189,6 +189,10 @@ public class PhishingDetector
 
 		// Run email contents through checker
 		contentsResult = emailContentsVerifier(splitContents, dictionary);
+
+		// Obtain percentages
+		subjectPercentageMisspelled = spellchecker(splitSubject, dictionary);
+		contentsPercentageMisspelled = spellchecker(splitContents, dictionary);
 
 		// Print results
 		if (emailVerifier(addressResult, subjectResult, contentsResult)){
