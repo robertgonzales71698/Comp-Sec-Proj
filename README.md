@@ -1,6 +1,6 @@
 <p align="center">
   <b>Computer Security Project</b><br>
-  <b>Gabriela Fisher - Isaigh Pugh - Robert Gonzales</b><br>
+  <b>Gabriela Fisher - Isaiah Pugh - Robert Gonzales</b><br>
   <b>© 2021 Group 16</b><br>
 
 ## Table of Contents
