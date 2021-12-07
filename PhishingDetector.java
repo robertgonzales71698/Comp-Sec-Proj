@@ -24,10 +24,10 @@ public class PhishingDetector
 	* Global variables declaration
 	*/
 	public static double subjectPercentageMisspelled; // Percentage of the email subject that is misspelled
-	public static double contentsPercentageMisspelled; // Percentage of the email contents that are misspelled
+	public static double bodyPercentageMisspelled; // Percentage of the email body that are misspelled
 	public static boolean addressResult; // The result of the email address verifier
 	public static boolean subjectResult; // The result of the email subject verifier
-	public static boolean contentsResult; // The result of the email contents verifier
+	public static boolean bodyResult; // The result of the email body verifier
 
 	/*
 	* Parse Address function takes the email address and splits it up into parts to be analyzied
@@ -43,7 +43,7 @@ public class PhishingDetector
 		String addressWebName = emailAddress.substring(atIndex + 1, dotIndex);
 		String addressDomain = emailAddress.substring(dotIndex + 1);
 
-
+		// Store the components of the email together and return the joint data
 		String[] parsedEmailAddress = new String[3];
 		parsedEmailAddress[0] = addressName;
 		parsedEmailAddress[1] = addressWebName;
@@ -52,24 +52,11 @@ public class PhishingDetector
 	}
 
 	/*
-	* Check Address Name function checks the email address name to see if spelled correctly
-	*/
-	public static Boolean checkAddressName(String[] parsedAddress, ArrayList<String> dict){
-		
-		// If the email address name is a correctly spelled word
-		if (dict.contains(parsedAddress[0])){
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-
-	/*
-	* Check Domain function checks the domain of the email addressto see if:
-	* 1 - The domain matches any of the verified domains in the verified list
+	* Check Domain function checks the domain of the email address to see if it is a verified web domain
 	*/
 	public static Boolean checkDomain(String[] parsedAddress){
+
+		// Checks to see if the email address domain is one of the following: .com, .org, .edu, or .gov
 		if (parsedAddress[1].equals("com") || parsedAddress[1].equals("org") || parsedAddress[1].equals("edu") || parsedAddress[1].equals("gov")){
 			return true;
 		}
@@ -79,17 +66,15 @@ public class PhishingDetector
 	}
 
 	/*
-	* Check Domain function checks the domain of the email addressto see if:
-	* 1 - The domain matches any of the verified domains in the verified list
+	* Check web name function checks the web name of the email address to see if it is a verified web name
 	*/
 	public static Boolean checkWebName(String[] parsedAddress,ArrayList<String> providersDict){
+		
+		// Checks to see if the web name is in the list of verified providers
 		if (providersDict.contains(parsedAddress[1])){
 			return true;
 		}
-
-		/*
-		* Checks to see if .edu account, meaning more possible web names
-		*/
+		// Checks to see if the domain is verified, meaning more verifiable web names are possible
 		else if (checkDomain(parsedAddress)){
 			return true;
 		}
@@ -98,33 +83,44 @@ public class PhishingDetector
 		}
 	}
 
-	public static Boolean emailAddressVerifier(String[] parsedAddress, ArrayList<String> dict, ArrayList<String> providersDict)
+	/*
+	* The email address verifier function drives the functions that check to verify the email address
+	*/
+	public static Boolean emailAddressVerifier(String[] parsedAddress, ArrayList<String> providersDict)
 	{
-		if ((checkAddressName(parsedAddress, dict)) && (checkWebName(parsedAddress, providersDict))){
+		// Checks to see if the web name is verifiable
+		if (checkWebName(parsedAddress, providersDict)){
 			return true;
 		}
-		
 		return false;
 	}
 
-
+	/*
+	* The spell checker function takes the text and check to see if each word is listed in the dictionary list
+	*/
 	public static double spellchecker(String[] text, ArrayList<String> dict)
 	{
-		double misspelledCount = 0;
+		double misspelledCount = 0; // Keeps track of the number of mispelled words in the text
 
+		// For all of the words in the text, if a word is not listed in the dictionary then it is considered misspelled
 		for (int i = 0; i < text.length; i++){
 			if (!dict.contains(text[i])){
 				misspelledCount++;
 			}
 		}
 
+		// Get the percentage of the text that is misspelled and return it
 		double percentageMisspelled = (misspelledCount / text.length);
 		percentageMisspelled = percentageMisspelled * 100;
-
 		return percentageMisspelled;
 	}
 
+	/*
+	* The email subject verifier function drives the functions that check to verify the email address
+	*/
 	public static Boolean emailSubjectVerifier(String[] splitSubject, ArrayList<String> dict){
+
+		// If 25% or less of the email subject is misspelled, then return that the subject is validated
 		if (spellchecker(splitSubject, dict) <= 25.0){
 			return true;
 		}
@@ -133,8 +129,13 @@ public class PhishingDetector
 		}
 	}
 
-	public static Boolean emailContentsVerifier(String[] splitContents, ArrayList<String> dict){
-		if (spellchecker(splitContents, dict) <= 35.0){
+	/*
+	* The email subject verifier function drives the functions that check to verify the email address
+	*/
+	public static Boolean emailBodyVerifier(String[] splitBody, ArrayList<String> dict){
+
+		// If 35% or less of the email body is misspelled, then return that the body is validated
+		if (spellchecker(splitBody, dict) <= 35.0){
 			return true;
 		}
 		else{
@@ -144,14 +145,16 @@ public class PhishingDetector
 
 
 	/*
-	* Final email verifier
+	* The save result function takes all of the data points and inputs collected and saves them in a formatted csv file
 	*/
 	public static void saveResult(String filePath, String address, Boolean addressVerifier, String subject, Boolean subjectVerifier, String body, Boolean bodyVerifier, Double subjectPercent, Double bodyPercent, String actual){
 		try {
+			// Setup the file variables/writers
 			FileWriter outputFile = new FileWriter(filePath, true);
 			BufferedWriter writer = new BufferedWriter(outputFile);
 			PrintWriter pw = new PrintWriter(writer);
 
+			// Write the data out in a csv format, and then close the writer
 			pw.println(address + "," + addressVerifier + "," + subject + "," + subjectVerifier + "," + body + "," + bodyVerifier + "," + subjectPercent + "," + bodyPercent + "," + actual);
 			pw.flush();
 			pw.close();
@@ -182,23 +185,32 @@ public class PhishingDetector
 		}
 		sc.close();
 
+		// Create the output file name
 		String file = "results.csv";
+
+		/***************************************************
+		* Change this to the desired test file for testing *
+		***************************************************/
 		Scanner scnr = new Scanner(new File("Test Cases/some fake emails.txt"));
+
+		// Create the storage array and read in the input file with the emails
 		String [] email = new String[4];
 		while (scnr.hasNextLine()){
+
+			// Split the input file up on each line by the pipe character "|" that differentiates the different components of each email
 			email = scnr.nextLine().split("\\|");
 		
 			// Take in email components
 			String emailAddress = email[0];
 			String subject = email[1];
-			String emailContents = email[2];
+			String emailBody = email[2];
 			String actual = email[3];
 
 			// Split the email address parts up
 			String[] parsedEmailAddress = parseAddress(emailAddress);
 
 			// Run the parsed email address through checker
-			addressResult = emailAddressVerifier(parsedEmailAddress, dictionary, providersDict);
+			addressResult = emailAddressVerifier(parsedEmailAddress, providersDict);
 
 			// Remove commas and periods, then split the email subject into Array List of individual words
 			subject = subject.replace(",", "");
@@ -209,20 +221,21 @@ public class PhishingDetector
 			// Run subject through checker
 			subjectResult = emailSubjectVerifier(splitSubject, dictionary);
 
-			// Remove commas and periods, then split the email contents into Array List of individual words
-			emailContents = emailContents.replace(",", "");
-			emailContents = emailContents.replace(".", "");
-			emailContents = emailContents.toLowerCase();
-			String[] splitContents = emailContents.split(" ");
+			// Remove commas and periods, then split the email body into Array List of individual words
+			emailBody = emailBody.replace(",", "");
+			emailBody = emailBody.replace(".", "");
+			emailBody = emailBody.toLowerCase();
+			String[] splitBody = emailBody.split(" ");
 
-			// Run email contents through checker
-			contentsResult = emailContentsVerifier(splitContents, dictionary);
+			// Run email body through checker
+			bodyResult = emailBodyVerifier(splitBody, dictionary);
 
 			// Obtain percentages
 			subjectPercentageMisspelled = spellchecker(splitSubject, dictionary);
-			contentsPercentageMisspelled = spellchecker(splitContents, dictionary);
+			bodyPercentageMisspelled = spellchecker(splitBody, dictionary);
 		
-			saveResult(file, emailAddress, addressResult, subject, subjectResult, emailContents, contentsResult, subjectPercentageMisspelled, contentsPercentageMisspelled, actual);	
+			// Compile all of the data collected/calculated and save it to the output file
+			saveResult(file, emailAddress, addressResult, subject, subjectResult, emailBody, bodyResult, subjectPercentageMisspelled, bodyPercentageMisspelled, actual);	
 		}
 		scnr.close();
     }
