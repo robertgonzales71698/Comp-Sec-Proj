@@ -2,16 +2,13 @@
  * 
  * @author Gabriela Fisher, Isaigh Pugh, & Robert Gonzales
  * @version Fall 2021
- * The University of Oklahoma CS 4173 - Computer Securtiy
+ * The University of Oklahoma CS 4173/5173 - Computer Securtiy
  * 
  * 
  * 
  */
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.lang.Object;
-import java.lang.StringBuilder;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -19,11 +16,14 @@ import java.util.Scanner;
 
 public class PhishingDetector
 {
-	public static double subjectPercentageMisspelled;
-	public static double contentsPercentageMisspelled;
-	public static boolean addressResult;
-	public static boolean subjectResult;
-	public static boolean contentsResult;
+	/*
+	* Global variables declaration
+	*/
+	public static double subjectPercentageMisspelled; // Percentage of the email subject that is misspelled
+	public static double contentsPercentageMisspelled; // Percentage of the email contents that are misspelled
+	public static boolean addressResult; // The result of the email address verifier
+	public static boolean subjectResult; // The result of the email subject verifier
+	public static boolean contentsResult; // The result of the email contents verifier
 
 	/*
 	* Parse Address function takes the email address and splits it up into parts to be analyzied
@@ -58,7 +58,7 @@ public class PhishingDetector
 	* 1 - The domain matches any of the verified domains in the verified list
 	*/
 	public static Boolean checkDomain(String[] parsedAddress){
-		if (parsedAddress[0].equals("com") || parsedAddress[1].equals("org") || parsedAddress[1].equals("edu") || parsedAddress[1].equals("gov")){
+		if (parsedAddress[1].equals("com") || parsedAddress[1].equals("org") || parsedAddress[1].equals("edu") || parsedAddress[1].equals("gov")){
 			return true;
 		}
 		else {
@@ -70,8 +70,9 @@ public class PhishingDetector
 	* Check Domain function checks the domain of the email addressto see if:
 	* 1 - The domain matches any of the verified domains in the verified list
 	*/
-	public static Boolean checkWebName(String[] parsedAddress){
-		if (parsedAddress[1].equals("gmail") || parsedAddress[1].equals("ymail") || parsedAddress[1].equals("yahoo") || parsedAddress[1].equals("hotmail")){
+	public static Boolean checkWebName(String[] parsedAddress,ArrayList<String> providersDict){
+		if (providersDict.contains(parsedAddress[1])){
+			System.out.println("True");
 			return true;
 		}
 
@@ -81,15 +82,14 @@ public class PhishingDetector
 		else if (checkDomain(parsedAddress)){
 			return true;
 		}
-
 		else {
 			return false;
 		}
 	}
 
-	public static Boolean emailAddressVerifier(String[] parsedAddress, ArrayList<String> dict)
+	public static Boolean emailAddressVerifier(String[] parsedAddress, ArrayList<String> dict, ArrayList<String> providersDict)
 	{
-		if ((checkAddressName(parsedAddress, dict)) && (checkWebName(parsedAddress))){
+		if ((checkAddressName(parsedAddress, dict)) && (checkWebName(parsedAddress, providersDict))){
 			return true;
 		}
 		
@@ -132,7 +132,9 @@ public class PhishingDetector
 	}
 
 
-
+	/*
+	* Final email verifier
+	*/
 	public static Boolean emailVerifier(Boolean addressVerifier, Boolean subjectVerifier, Boolean contentsVerifier){
 		if ((addressVerifier) && (subjectVerifier) && (contentsVerifier)){
 			return true;
@@ -150,7 +152,11 @@ public class PhishingDetector
 			return false;
 		}
 	}
-     public static void main(String[] args) throws FileNotFoundException {
+
+	/*
+	* Main function that serves as the driver
+	*/
+	public static void main(String[] args) throws FileNotFoundException {
           
 		// Take in email components
 		String emailAddress = "example@gmail.com";
@@ -158,7 +164,7 @@ public class PhishingDetector
 		String emailContents = "This is a test email. The email address, subject, and contents of this email are for the demo.";
 		  
 		  
-		// Create the dictionary to spell check against
+		// Create the word dictionary to spell check against
 		Scanner s = new Scanner(new File("words_alpha.txt"));
 		ArrayList<String> dictionary = new ArrayList<String>();
 		while (s.hasNextLine()){
@@ -166,11 +172,19 @@ public class PhishingDetector
 		}
 		s.close();
 
+		// Create the email provider dictionary to check verified email providers
+		Scanner sc = new Scanner(new File("emailProviders_alpha.txt"));
+		ArrayList<String> providersDict = new ArrayList<String>();
+		while (sc.hasNextLine()){
+			providersDict.add(sc.nextLine());
+		}
+		sc.close();
+
 		// Split the email address parts up
 		String[] parsedEmailAddress = parseAddress(emailAddress);
 
 		// Run the parsed email address through checker
-		addressResult = emailAddressVerifier(parsedEmailAddress, dictionary);
+		addressResult = emailAddressVerifier(parsedEmailAddress, dictionary, providersDict);
 
 		// Remove commas and periods, then split the email subject into Array List of individual words
 		subject = subject.replace(",", "");
