@@ -183,7 +183,7 @@ public class PhishingDetector
 		sc.close();
 
 		String file = "results.csv";
-		Scanner scnr = new Scanner(new File("some fake emails.txt"));
+		Scanner scnr = new Scanner(new File("Test Cases/some fake emails.txt"));
 		String [] email = new String[4];
 		while (scnr.hasNextLine()){
 			email = scnr.nextLine().split("\\|");
