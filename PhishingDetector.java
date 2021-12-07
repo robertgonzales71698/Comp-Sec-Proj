@@ -167,7 +167,7 @@ public class PhishingDetector
 	public static void main(String[] args) throws FileNotFoundException {
 		  
 		// Create the word dictionary to spell check against
-		Scanner s = new Scanner(new File("words_alpha.txt"));
+		Scanner s = new Scanner(new File("Dictionary and Helpers/words_alpha.txt"));
 		ArrayList<String> dictionary = new ArrayList<String>();
 		while (s.hasNextLine()){
 			dictionary.add(s.nextLine());
@@ -175,7 +175,7 @@ public class PhishingDetector
 		s.close();
 
 		// Create the email provider dictionary to check verified email providers
-		Scanner sc = new Scanner(new File("emailProviders_alpha.txt"));
+		Scanner sc = new Scanner(new File("Dictionary and Helpers/emailProviders_alpha.txt"));
 		ArrayList<String> providersDict = new ArrayList<String>();
 		while (sc.hasNextLine()){
 			providersDict.add(sc.nextLine());
