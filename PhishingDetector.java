@@ -1,19 +1,23 @@
 /*
  * 
- * @author Gabriela Fisher, Isaigh Pugh, & Robert Gonzales
+ * @author Gabriela Fisher, Isaigh Pugh, Robert Gonzales
  * @version Fall 2021
- * The University of Oklahoma CS 4173/5173 - Computer Securtiy
- * 
- * 
+ * The University of Oklahoma CS 4173/5173 - Computer Security
  * 
  */
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 
-
+/*
+* The phishing detector class serves as the java class to house the driver (main function) and all of the functions that are called in the driver
+*/
 public class PhishingDetector
 {
 	/*
@@ -29,11 +33,17 @@ public class PhishingDetector
 	* Parse Address function takes the email address and splits it up into parts to be analyzied
 	*/
 	public static String[] parseAddress(String emailAddress){
+
+		// Get the location of the @ and . characters in the email address
 		int atIndex =  emailAddress.indexOf("@");
 		int dotIndex = emailAddress.indexOf(".");
+
+		// Obtain and store the email address's name, web name, and domain based on the character locations
 		String addressName = emailAddress.substring(0, atIndex);
 		String addressWebName = emailAddress.substring(atIndex + 1, dotIndex);
 		String addressDomain = emailAddress.substring(dotIndex + 1);
+
+
 		String[] parsedEmailAddress = new String[3];
 		parsedEmailAddress[0] = addressName;
 		parsedEmailAddress[1] = addressWebName;
@@ -45,6 +55,8 @@ public class PhishingDetector
 	* Check Address Name function checks the email address name to see if spelled correctly
 	*/
 	public static Boolean checkAddressName(String[] parsedAddress, ArrayList<String> dict){
+		
+		// If the email address name is a correctly spelled word
 		if (dict.contains(parsedAddress[0])){
 			return true;
 		}
@@ -72,7 +84,6 @@ public class PhishingDetector
 	*/
 	public static Boolean checkWebName(String[] parsedAddress,ArrayList<String> providersDict){
 		if (providersDict.contains(parsedAddress[1])){
-			System.out.println("True");
 			return true;
 		}
 
@@ -117,7 +128,7 @@ public class PhishingDetector
 		if (spellchecker(splitSubject, dict) <= 25.0){
 			return true;
 		}
-		else{
+		else {
 			return false;
 		}
 	}
@@ -135,21 +146,18 @@ public class PhishingDetector
 	/*
 	* Final email verifier
 	*/
-	public static Boolean emailVerifier(Boolean addressVerifier, Boolean subjectVerifier, Boolean contentsVerifier){
-		if ((addressVerifier) && (subjectVerifier) && (contentsVerifier)){
-			return true;
+	public static void saveResult(String filePath, String address, Boolean addressVerifier, String subject, Boolean subjectVerifier, String body, Boolean bodyVerifier, Double subjectPercent, Double bodyPercent, String actual){
+		try {
+			FileWriter outputFile = new FileWriter(filePath, true);
+			BufferedWriter writer = new BufferedWriter(outputFile);
+			PrintWriter pw = new PrintWriter(writer);
+
+			pw.println(address + "," + addressVerifier + "," + subject + "," + subjectVerifier + "," + body + "," + bodyVerifier + "," + subjectPercent + "," + bodyPercent + "," + actual);
+			pw.flush();
+			pw.close();
 		}
-		else if ((!addressVerifier) && (subjectVerifier) && (contentsVerifier)){
-			return true;
-		}
-		else if ((addressVerifier) && (!subjectVerifier) && (contentsVerifier)){
-			return true;
-		}
-		else if ((addressVerifier) && (subjectVerifier) && (!contentsVerifier)){
-			return true;
-		}
-		else{
-			return false;
+		catch (IOException e){
+			e.printStackTrace();
 		}
 	}
 
@@ -157,12 +165,6 @@ public class PhishingDetector
 	* Main function that serves as the driver
 	*/
 	public static void main(String[] args) throws FileNotFoundException {
-          
-		// Take in email components
-		String emailAddress = "example@gmail.com";
-		String subject = "Test Email";
-		String emailContents = "This is a test email. The email address, subject, and contents of this email are for the demo.";
-		  
 		  
 		// Create the word dictionary to spell check against
 		Scanner s = new Scanner(new File("words_alpha.txt"));
@@ -180,40 +182,48 @@ public class PhishingDetector
 		}
 		sc.close();
 
-		// Split the email address parts up
-		String[] parsedEmailAddress = parseAddress(emailAddress);
+		String file = "results.csv";
+		Scanner scnr = new Scanner(new File("testCases.txt"));
+		String [] email = new String[4];
+		while (scnr.hasNextLine()){
+			email = scnr.nextLine().split("\\|");
+		
+			// Take in email components
+			String emailAddress = email[0];
+			String subject = email[1];
+			String emailContents = email[2];
+			String actual = email[3];
 
-		// Run the parsed email address through checker
-		addressResult = emailAddressVerifier(parsedEmailAddress, dictionary, providersDict);
+			// Split the email address parts up
+			String[] parsedEmailAddress = parseAddress(emailAddress);
 
-		// Remove commas and periods, then split the email subject into Array List of individual words
-		subject = subject.replace(",", "");
-		subject = subject.replace(".", "");
-		subject = subject.toLowerCase();
-		String[] splitSubject = subject.split(" ");
+			// Run the parsed email address through checker
+			addressResult = emailAddressVerifier(parsedEmailAddress, dictionary, providersDict);
 
-		// Run subject through checker
-		subjectResult = emailSubjectVerifier(splitSubject, dictionary);
+			// Remove commas and periods, then split the email subject into Array List of individual words
+			subject = subject.replace(",", "");
+			subject = subject.replace(".", "");
+			subject = subject.toLowerCase();
+			String[] splitSubject = subject.split(" ");
 
-		// Remove commas and periods, then split the email contents into Array List of individual words
-		emailContents = emailContents.replace(",", "");
-		emailContents = emailContents.replace(".", "");
-		emailContents = emailContents.toLowerCase();
-		String[] splitContents = emailContents.split(" ");
+			// Run subject through checker
+			subjectResult = emailSubjectVerifier(splitSubject, dictionary);
 
-		// Run email contents through checker
-		contentsResult = emailContentsVerifier(splitContents, dictionary);
+			// Remove commas and periods, then split the email contents into Array List of individual words
+			emailContents = emailContents.replace(",", "");
+			emailContents = emailContents.replace(".", "");
+			emailContents = emailContents.toLowerCase();
+			String[] splitContents = emailContents.split(" ");
 
-		// Obtain percentages
-		subjectPercentageMisspelled = spellchecker(splitSubject, dictionary);
-		contentsPercentageMisspelled = spellchecker(splitContents, dictionary);
+			// Run email contents through checker
+			contentsResult = emailContentsVerifier(splitContents, dictionary);
 
-		// Print results
-		if (emailVerifier(addressResult, subjectResult, contentsResult)){
-			System.out.println("All tests have passed: Email is verified");
+			// Obtain percentages
+			subjectPercentageMisspelled = spellchecker(splitSubject, dictionary);
+			contentsPercentageMisspelled = spellchecker(splitContents, dictionary);
+		
+			saveResult(file, emailAddress, addressResult, subject, subjectResult, emailContents, contentsResult, subjectPercentageMisspelled, contentsPercentageMisspelled, actual);	
 		}
-		else {
-			System.out.println("Not all tests have passed: Email is unverified");
-		}
-     }
+		scnr.close();
+    }
 }
