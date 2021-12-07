@@ -8,10 +8,9 @@
     1 Introduction.................................................................1
       1.1 GitHub Repository Link...................................................1
       1.2 How to Run the Code......................................................1
-      1.3 References...............................................................1
-    2 Background Research..........................................................1
     
 ## Introduction
+This README file provides an overview of the project and how to run the project code.
 
 ### GitHub Repository Link
 https://github.com/robertgonzales71698/Comp-Sec-Proj
