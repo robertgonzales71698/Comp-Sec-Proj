@@ -1,7 +1,4 @@
-package Phishnet;
-
 import java.io.File;
-
 import org.encog.Encog;
 import org.encog.ml.data.MLDataSet;
 import org.encog.ml.data.basic.BasicMLDataSet;
