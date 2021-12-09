@@ -23,5 +23,6 @@ To run phishing detector:
 4) In the project directory, find the "Test Cases" folder and locate a test case file you would like to test
 5) On line 194 in the PhishingDetector.java file, change the file path for the scanner to your desired test file (KEEP "Test Cases/" part, just change the file name after that)
 6) Save the changes and run
+7) To run the included saved neural network, run the PhishNetSaved file. You can also use the Encog Workbench, downloadable from the Encog link above, to run the .eg file used by this directly.
 
 The output file with the results should appear in the project directory (default is "results.csv", if wanting to change output file name edit line 189 in the PhishingDetector.java file)
