@@ -1,7 +1,7 @@
 <p align="center">
   <b>Computer Security Project</b><br>
   <b>Gabriela Fisher - Isaigh Pugh - Robert Gonzales</b><br>
-  <b>© 2021 Group 16</b><br>
+  <b>© CS 4713/5713 Fall 2021 - Group 16</b><br>
 
 # Table of Contents
 
@@ -27,4 +27,4 @@ To run phishing detector:
 8) To view the probabilistic neural network, load the PB-copy.eg file in Encog Workbench.
 9) If you want to make and evaluate a new network based on the results of the checker, run the checker to obtain a results.csv file and then run the NewNetwork.java file.
 
-The output file with the results should appear in the project directory (default is "results.csv", if wanting to change output file name edit line 189 in the PhishingDetector.java file)
+The output file with the results should appear in the project directory (default is "results.csv", if wanting to change output file name edit line 214 in the PhishingDetector.java file)

@@ -208,7 +208,9 @@ public class PhishingDetector
 		}
 		sc.close();
 
-		// Create the output file name
+		/***************************************************
+		* Change this to the desired output file name      *
+		***************************************************/
 		String file = "results.csv";
 
 		/***************************************************
