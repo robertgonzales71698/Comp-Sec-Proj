@@ -10,7 +10,7 @@
       1.2 How to Run the Code......................................................1
     
 ## Introduction
-This README file provides an overview of the project and how to run the project code.
+This README file provides an overview of the project and how to run the project code. The neural network portion of the code uses the Encog library, which can be downloaded here: https://github.com/jeffheaton/encog-java-core
 
 ### GitHub Repository Link
 https://github.com/robertgonzales71698/Comp-Sec-Proj
