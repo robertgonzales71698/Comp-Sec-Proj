@@ -28,6 +28,8 @@ public class PhishingDetector
 	public static boolean addressResult; // The result of the email address verifier
 	public static boolean subjectResult; // The result of the email subject verifier
 	public static boolean bodyResult; // The result of the email body verifier
+	public static boolean urlResult; // the result of the url checker
+	public static int numSus; //The result of the suspicious words checker
 
 	/*
 	* Parse Address function takes the email address and splits it up into parts to be analyzied
@@ -49,6 +51,27 @@ public class PhishingDetector
 		parsedEmailAddress[1] = addressWebName;
 		parsedEmailAddress[2] = addressDomain;
 		return parsedEmailAddress;
+	}
+
+	//Function to check if the e-mail contains a URL
+	public static Boolean checkURL(String[] text){
+		for(int i = 0; i < text.length; i++){
+			if(text[i].contains("www")){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	//function to check for the presence of suspicious words in the body
+	public static int susWords(String[] text){
+		int temp = 0;
+		for(int i = 0; i < text.length; i++){
+			if(text[i].equals("account")||text[i].equals("password")){
+				temp++;
+			}
+		}
+		return temp;
 	}
 
 	/*
@@ -147,7 +170,7 @@ public class PhishingDetector
 	/*
 	* The save result function takes all of the data points and inputs collected and saves them in a formatted csv file
 	*/
-	public static void saveResult(String filePath, String address, Boolean addressVerifier, String subject, Boolean subjectVerifier, String body, Boolean bodyVerifier, Double subjectPercent, Double bodyPercent, String actual){
+	public static void saveResult(String filePath, Boolean addressVerifier, Boolean subjectVerifier, Boolean bodyVerifier, Double subjectPercent, Double bodyPercent, Boolean urlResult, int numSus, String actual){
 		try {
 			// Setup the file variables/writers
 			FileWriter outputFile = new FileWriter(filePath, true);
@@ -155,7 +178,7 @@ public class PhishingDetector
 			PrintWriter pw = new PrintWriter(writer);
 
 			// Write the data out in a csv format, and then close the writer
-			pw.println(address + "," + addressVerifier + "," + subject + "," + subjectVerifier + "," + body + "," + bodyVerifier + "," + subjectPercent + "," + bodyPercent + "," + actual);
+			pw.println(addressVerifier + "," + subjectVerifier +  "," + bodyVerifier + "," + subjectPercent + "," + bodyPercent + "," + urlResult + "," + numSus + "," + actual);
 			pw.flush();
 			pw.close();
 		}
@@ -229,13 +252,15 @@ public class PhishingDetector
 
 			// Run email body through checker
 			bodyResult = emailBodyVerifier(splitBody, dictionary);
+			urlResult = checkURL(splitBody);
+			numSus = susWords(splitBody);
 
 			// Obtain percentages
 			subjectPercentageMisspelled = spellchecker(splitSubject, dictionary);
 			bodyPercentageMisspelled = spellchecker(splitBody, dictionary);
 		
 			// Compile all of the data collected/calculated and save it to the output file
-			saveResult(file, emailAddress, addressResult, subject, subjectResult, emailBody, bodyResult, subjectPercentageMisspelled, bodyPercentageMisspelled, actual);	
+			saveResult(file, addressResult, subjectResult, bodyResult, subjectPercentageMisspelled, bodyPercentageMisspelled, urlResult, numSus, actual);	
 		}
 		scnr.close();
     }
